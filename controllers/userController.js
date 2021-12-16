@@ -33,8 +33,11 @@ class UserController {
             this.getPhoto(this.formElUpdate).then(
                 (content) => {
                     values.photo = content;
+                    let test = document.createElement('tr');
+                    test.dataset.admin = values.admin ? 'data-admin="true"' : '';
+                    console.log(test);
                     trDinamica.innerHTML =
-                        `<tr ${(values.admin)? 'admin="true"':''} class="tr-users">                             
+                        `<tr ${values.admin ? 'data-admin="true"':''} class="tr-users">                             
                             <td><img src="${values.photo}" alt="User Image" class="img-circle img-sm"></td>
                             <td>${values.name}</td>
                             <td>${values.email}</td>
@@ -199,7 +202,7 @@ class UserController {
         //console.log('dataUser:', dataUser);
 
         this.tableEl.innerHTML += ` 
-        <tr ${(dataUser.admin)? 'admin="true"':''} class="tr-users">
+        <tr ${(dataUser.admin)? 'data-admin="true"':''} class="tr-users">
             <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
             <td>${dataUser.name}</td>
             <td>${dataUser.email}</td>
@@ -284,7 +287,7 @@ class UserController {
 
             numberUsers++;
 
-            let attAdm = tr.getAttribute('admin');
+            let attAdm = tr.getAttribute('data-admin');
 
             if (attAdm) {
                 numberAdmin++;
