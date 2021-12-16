@@ -13,6 +13,7 @@ class UserController {
     onEdit() {
         document.querySelector('.btn-cancel').addEventListener('click', e => {
 
+
             this.showPanelCreate();
 
         });
@@ -27,11 +28,42 @@ class UserController {
 
             var values = this.getValues(this.formElUpdate);
 
+            const trDinamica = document.querySelector('.tr-dinamica');
 
+            this.getPhoto(this.formElUpdate).then(
+                (content) => {
+                    values.photo = content;
+                    trDinamica.innerHTML =
+                        `<tr ${(values.admin)? 'admin="true"':''} class="tr-users">                             
+                            <td><img src="${values.photo}" alt="User Image" class="img-circle img-sm"></td>
+                            <td>${values.name}</td>
+                            <td>${values.email}</td>
+                            <td>${(values.admin)? 'sim':'Não'}</td>
+                            <td>${values.register.toLocaleDateString('pt-br')} - ${values.register.toLocaleTimeString('pt-br')}</td>
+                            <td>
+                                <button type="button" class="btn btn-edit btn-primary btn-xs btn-flat">Editar</button>
+                                <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+                            </td>
+                        </tr>`;
 
+                    this.botaoEditar(values); //a informaçao desse usario a ser editado vem aqui
 
+                    this.updateCount();
 
+                    [...this.tableEl.children].forEach(tr => {
+                        if (tr.classList.contains('tr-dinamica')) tr.classList.remove('tr-dinamica');
+                    });
 
+                    this.formElUpdate.reset();
+
+                    btn.disabled = false;
+                },
+                (e) => {
+                    console.log(e)
+                }
+            )
+
+            this.showPanelCreate();
 
         })
     }
@@ -54,7 +86,7 @@ class UserController {
                 return false;
             }
 
-            this.getPhoto().then(
+            this.getPhoto(this.formEl).then(
                 (content) => {
                     values.photo = content;
 
@@ -74,13 +106,13 @@ class UserController {
         })
     }
 
-    getPhoto() {
+    getPhoto(form) {
 
         return new Promise((resolve, reject) => {
 
             let fileReader = new FileReader();
 
-            let elements = [...this.formEl.elements].filter(formItem => {
+            let elements = [...form.elements].filter(formItem => {
 
                 if (formItem.name === 'photo') {
                     return formItem;
@@ -117,7 +149,7 @@ class UserController {
 
         var spread = [...form.elements];
 
-        spread.forEach(function(formItem, index) {
+        spread.forEach((formItem, index) => {
 
             if (['name', 'email', 'password'].indexOf(formItem.name) > -1 && !formItem.value) {
 
@@ -178,17 +210,23 @@ class UserController {
                 <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
             </td>
         </tr>`;
+        this.botaoEditar(dataUser);
+        this.updateCount();
+    }
 
-
+    botaoEditar(dataUser) {
 
         [...this.tableEl.children].forEach(tr => {
 
-            tr.querySelector('.btn-edit').addEventListener('click', _ => {
+            tr.querySelector('.btn-edit').addEventListener('click', e => {
 
+                [...this.tableEl.children].forEach(tr => {
+                    if (tr.classList.contains('tr-dinamica')) tr.classList.remove('tr-dinamica')
+                });
+
+                tr.classList.add('tr-dinamica');
 
                 let form = document.querySelector('#form-user-update');
-
-
 
                 for (let indice in dataUser) {
 
@@ -223,12 +261,8 @@ class UserController {
 
                 this.showPanelUpdate();
 
-            });
-
-        })
-
-
-        this.updateCount()
+            })
+        });
     }
 
     showPanelCreate() {
